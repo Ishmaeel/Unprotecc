@@ -1,13 +1,25 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Unprotecc
 {
     internal class Worker
     {
-        private const string Worksheet_Pattern = @"xl/worksheets.*\.xml$";
-        private const string Protection_Pattern = @"<sheetProtection.+?>";
+        private static readonly string[] File_Patterns = new string[]
+        {
+            @"xl/worksheets.*\.xml$",
+            @"xl/workbook.xml$"
+        };
+
+        private static readonly string[] Protection_Patterns = new string[]
+        {
+            @"<sheetProtection.+?>",
+            @"state=""hidden""",
+            @"state=""veryHidden"""
+        };
+
         private const string Output_Suffix = "_unprotecc";
 
         internal static void Run(string[] args)
@@ -58,7 +70,7 @@ namespace Unprotecc
             {
                 foreach (var oneEntry in zipArchive.Entries)
                 {
-                    if (!Regex.IsMatch(oneEntry.FullName, Worksheet_Pattern))
+                    if (!File_Patterns.Any(fp => Regex.IsMatch(oneEntry.FullName, fp)))
                         continue;
 
                     string contents;
@@ -69,7 +81,11 @@ namespace Unprotecc
                         contents = reader.ReadToEnd();
                     }
 
-                    var newContents = Regex.Replace(contents, Protection_Pattern, string.Empty);
+                    string newContents = contents;
+                    foreach (var onePattern in Protection_Patterns)
+                    {
+                        newContents = Regex.Replace(newContents, onePattern, string.Empty);
+                    }
 
                     if (newContents.Length == contents.Length)
                         continue;
