@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Unprotecc")]
 [assembly: AssemblyProduct("Unprotecc")]
@@ -6,3 +7,4 @@
 [assembly: AssemblyDescription("Removes sheet protection from XLSX files.")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: ComVisible(false)]
